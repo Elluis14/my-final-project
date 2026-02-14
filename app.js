@@ -1,16 +1,23 @@
 const gamesContainer = document.querySelector("#games");
 const form = document.querySelector("#searchForm");
 const input = document.querySelector("#searchInput");
+const statusText = document.querySelector("#status");
+
+const DEFAULT_SEARCH = "popular";
 
 form.addEventListener("submit", e => {
   e.preventDefault();
   searchGames(input.value);
 });
 
-window.addEventListener("load", loadFavorites);
+window.addEventListener("load", () => {
+  searchGames(DEFAULT_SEARCH);
+  loadFavorites();
+});
 
 async function searchGames(query) {
-  gamesContainer.innerHTML = "<p>Loading...</p>";
+  statusText.textContent = `Results for "${query}"`;
+  gamesContainer.innerHTML = "<p>Loading games...</p>";
 
   const response = await fetch(
     `https://www.cheapshark.com/api/1.0/games?title=${query}&limit=10`
@@ -59,12 +66,6 @@ function saveGame(game) {
 function loadFavorites() {
   const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
   if (favorites.length > 0) {
-    displayGames(
-      favorites.map(f => ({
-        external: f.title,
-        cheapest: f.price,
-        thumb: "https://via.placeholder.com/300x140?text=Saved+Game"
-      }))
-    );
+    console.log("Saved games loaded from localStorage", favorites);
   }
 }
